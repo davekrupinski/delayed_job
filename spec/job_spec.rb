@@ -50,7 +50,13 @@ describe Delayed::Job do
 
   it "should be able to set priority when enqueuing items" do
     Delayed::Job.enqueue SimpleJob.new, 5
-    Delayed::Job.first.priority.should == 5
+    Delayed::Job.first.priority.should == -5
+  end
+  
+  it "should honor priority (even though negative) when finding available jobs" do
+    Delayed::Job.enqueue SimpleJob.new, 10
+    Delayed::Job.enqueue SimpleJob.new, -5
+    Delayed::Job.find_available(1).first.priority.should == -10
   end
 
   it "should be able to set run_at when enqueuing items" do

@@ -23,7 +23,7 @@ module Delayed
     self.worker_name = "host:#{Socket.gethostname} pid:#{Process.pid}" rescue "pid:#{Process.pid}"
 
     NextTaskSQL         = '(run_at <= ? AND (locked_at IS NULL OR locked_at < ?) OR (locked_by = ?)) AND failed_at IS NULL'
-    NextTaskOrder       = 'priority DESC, run_at ASC'
+    NextTaskOrder       = 'priority ASC, run_at ASC'
 
     ParseObjectFromYaml = /\!ruby\/\w+\:([^\s]+)/
 
@@ -110,10 +110,10 @@ module Delayed
         raise ArgumentError, 'Cannot enqueue items which do not respond to perform'
       end
     
-      priority = args.first || 0
+      priority = ((args.first || 0) * -1).to_i
       run_at   = args[1]
 
-      Job.create(:payload_object => object, :priority => priority.to_i, :run_at => run_at)
+      Job.create(:payload_object => object, :priority => priority, :run_at => run_at)
     end
 
     # Find a few candidate jobs to run (in case some immediately get locked by others).

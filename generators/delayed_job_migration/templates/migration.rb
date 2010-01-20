@@ -14,6 +14,7 @@ class CreateDelayedJobs < ActiveRecord::Migration
     end
 
     add_index :delayed_jobs, :locked_by
+    add_index :delayed_jobs, [ :priority, :run_at ]
   end
 
   def self.down
